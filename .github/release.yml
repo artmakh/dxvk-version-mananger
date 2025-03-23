@@ -1,0 +1,25 @@
+# .github/release.yml
+# This configures GitHub's automatic release notes generator
+
+changelog:
+  categories:
+    - title: Features
+      labels:
+        - feat
+        - feature
+        - enhancement
+    - title: Bug Fixes
+      labels:
+        - fix
+        - bug
+    - title: Documentation
+      labels:
+        - docs
+        - documentation
+    - title: Performance Improvements
+      labels:
+        - perf
+        - performance
+    - title: Other Changes
+      labels:
+        - "*" 
