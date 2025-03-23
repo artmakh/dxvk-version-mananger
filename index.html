@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DXVK Version Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" data-tab="installed-games">Installed Games</button>
+            <button class="tab-button" data-tab="dxvk-versions">DXVK Versions</button>
+            <button class="tab-button" data-tab="dxvk-gplasync">DXVK-gplasync Versions</button>
+        </div>
+        
+        <div class="tab-content">
+            <div id="installed-games" class="tab-pane active">
+                <h2>Installed Games</h2>
+                <div class="content-area">
+                    <p>Manage DXVK versions for your installed games.</p>
+                    <!-- Content for Installed Games tab will go here -->
+                </div>
+            </div>
+            
+            <div id="dxvk-versions" class="tab-pane">
+                <h2>DXVK Versions</h2>
+                <div class="content-area">
+                    <p>Manage available DXVK versions.</p>
+                    <!-- Content for DXVK Versions tab will go here -->
+                </div>
+            </div>
+            
+            <div id="dxvk-gplasync" class="tab-pane">
+                <h2>DXVK-gplasync Versions</h2>
+                <div class="content-area">
+                    <p>Manage DXVK-gplasync versions.</p>
+                    <!-- Content for DXVK-gplasync Version tab will go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html> 
