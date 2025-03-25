@@ -31,7 +31,11 @@ contextBridge.exposeInMainWorld(
     
     // New functions for enhanced DLL management
     checkBackupExists: (gameDir) => ipcRenderer.invoke('check-backup-exists', gameDir),
-    removeDxvkFromGame: (game) => ipcRenderer.invoke('remove-dxvk-from-game', game.appid)
+    removeDxvkFromGame: (game) => ipcRenderer.invoke('remove-dxvk-from-game', game.appid),
+    
+    // Game metadata customization
+    saveCustomGameMetadata: (gameId, metadataUpdates) => 
+      ipcRenderer.invoke('save-custom-game-metadata', gameId, metadataUpdates)
   }
 );
 

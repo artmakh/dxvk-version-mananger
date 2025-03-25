@@ -34,6 +34,24 @@ function formatMetadataValue(value) {
     return value;
 }
 
+// Save custom game metadata
+async function saveCustomGameMetadata(gameId, metadataUpdates) {
+    try {
+        // Call the main process to save the custom metadata
+        const result = await window.electronAPI.saveCustomGameMetadata(gameId, metadataUpdates);
+        if (result.success) {
+            console.log(`Successfully saved custom metadata for game ${gameId}`);
+            return true;
+        } else {
+            console.error(`Failed to save custom metadata: ${result.message}`);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error saving custom metadata:', error);
+        return false;
+    }
+}
+
 // Format date to a readable string
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -135,12 +153,53 @@ async function initInstalledGamesTab() {
                                 
                             additionalDetails = `
                                 <div class="detail-row">
-                                    <span class="detail-label">Direct3D:</span>
-                                    <span class="detail-value">${direct3dInfo}</span>
+                                    <span class="detail-label">Direct3D:</span>`;
+
+                            // If Direct3D info is unknown or custom_d3d is true, show a dropdown selector
+                            if (direct3dInfo === 'No info about Direct3D versions' || metadata.custom_d3d === true) {
+                                additionalDetails += `
+                                    <span class="detail-value custom-selector">
+                                        <select class="direct3d-selector" data-game-id="${game.appid}">
+                                            <option value="">Choose Direct3D version</option>
+                                            <option value="Direct3D 8" ${metadata.direct3dVersions === 'Direct3D 8' ? 'selected' : ''}>Direct3D 8</option>
+                                            <option value="Direct3D 9" ${metadata.direct3dVersions === 'Direct3D 9' ? 'selected' : ''}>Direct3D 9</option>
+                                            <option value="Direct3D 10" ${metadata.direct3dVersions === 'Direct3D 10' ? 'selected' : ''}>Direct3D 10</option>
+                                            <option value="Direct3D 11" ${metadata.direct3dVersions === 'Direct3D 11' ? 'selected' : ''}>Direct3D 11</option>
+                                        </select>
+                                    </span>`;
+                            } else {
+                                additionalDetails += `
+                                    <span class="detail-value">${direct3dInfo}</span>`;
+                            }
+
+                            additionalDetails += `
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Windows exec:</span>
-                                    <span class="detail-value">${executableInfo}</span>
+                                    <span class="detail-label">Windows exec:</span>`;
+
+                            // If executable info is unknown or custom_exec is true, show a dropdown selector
+                            if (executableInfo === 'No info about Windows executable' || metadata.custom_exec === true) {
+                                const is32bit = metadata.executable32bit === 'true';
+                                const is64bit = metadata.executable64bit === 'true';
+                                let selectedValue = '';
+                                
+                                if (is32bit) selectedValue = 'x32';
+                                else if (is64bit) selectedValue = 'x64';
+                                
+                                additionalDetails += `
+                                    <span class="detail-value custom-selector">
+                                        <select class="executable-selector" data-game-id="${game.appid}">
+                                            <option value="">Choose architecture</option>
+                                            <option value="x32" ${selectedValue === 'x32' ? 'selected' : ''}>32-bit</option>
+                                            <option value="x64" ${selectedValue === 'x64' ? 'selected' : ''}>64-bit</option>
+                                        </select>
+                                    </span>`;
+                            } else {
+                                additionalDetails += `
+                                    <span class="detail-value">${executableInfo}</span>`;
+                            }
+
+                            additionalDetails += `
                                 </div>`;
                         }
                         
@@ -166,11 +225,15 @@ async function initInstalledGamesTab() {
                         // Only show the button for non-Vulkan games
                         let buttonHtml = '';
                         if (!hasVulkan) {
-                            const buttonClass = hasCompleteInfo ? 'action-btn' : 'action-btn disabled';
+                            // Set the button as enabled if:
+                            // 1. We have complete info from PCGamingWiki OR
+                            // 2. We have both custom_d3d and custom_exec (user has selected both values)
+                            const hasCompletedCustomInfo = metadata.custom_d3d === true && metadata.custom_exec === true;
+                            const buttonClass = hasCompleteInfo || hasCompletedCustomInfo ? 'action-btn' : 'action-btn disabled';
                             const buttonText = dxvkStatus && dxvkStatus.patched ? 'Update DXVK' : 'Manage DXVK';
                             
                             buttonHtml = '<div class="buttons-container">';
-                            buttonHtml += `<button class="${buttonClass}" data-game-id="${game.appid}" ${!hasCompleteInfo ? 'disabled' : ''}>${buttonText}</button>`;
+                            buttonHtml += `<button class="${buttonClass}" data-game-id="${game.appid}" ${!hasCompleteInfo && !hasCompletedCustomInfo ? 'disabled' : ''}>${buttonText}</button>`;
                             
                             // Add restore button if game has DXVK installed (patched), regardless of backup status
                             if (dxvkStatus && dxvkStatus.patched) {
@@ -195,6 +258,58 @@ async function initInstalledGamesTab() {
                                 
                                 // Show the DXVK selection modal
                                 await showDxvkSelectionModal(gameId, game.name, metadata);
+                            });
+                        }
+                        
+                        // Add event listeners to the dropdowns if they exist
+                        const direct3dSelector = gameCard.querySelector('.direct3d-selector');
+                        if (direct3dSelector) {
+                            direct3dSelector.addEventListener('change', async (e) => {
+                                const gameId = e.target.getAttribute('data-game-id');
+                                const selectedDirect3D = e.target.value;
+                                
+                                if (selectedDirect3D) {
+                                    console.log(`Selected Direct3D version ${selectedDirect3D} for game ${gameId}`);
+                                    
+                                    // Update the game metadata
+                                    const metadataUpdates = {
+                                        direct3dVersions: selectedDirect3D,
+                                        custom_d3d: true
+                                    };
+                                    
+                                    if (await saveCustomGameMetadata(gameId, metadataUpdates)) {
+                                        // Reload the installed games tab to reflect changes
+                                        await initInstalledGamesTab();
+                                    } else {
+                                        alert('Failed to save Direct3D information. Please try again.');
+                                    }
+                                }
+                            });
+                        }
+
+                        const executableSelector = gameCard.querySelector('.executable-selector');
+                        if (executableSelector) {
+                            executableSelector.addEventListener('change', async (e) => {
+                                const gameId = e.target.getAttribute('data-game-id');
+                                const selectedExec = e.target.value;
+                                
+                                if (selectedExec) {
+                                    console.log(`Selected Windows executable architecture ${selectedExec} for game ${gameId}`);
+                                    
+                                    // Update the game metadata
+                                    const metadataUpdates = {
+                                        executable32bit: selectedExec === 'x32' ? 'true' : 'false',
+                                        executable64bit: selectedExec === 'x64' ? 'true' : 'false',
+                                        custom_exec: true
+                                    };
+                                    
+                                    if (await saveCustomGameMetadata(gameId, metadataUpdates)) {
+                                        // Reload the installed games tab to reflect changes
+                                        await initInstalledGamesTab();
+                                    } else {
+                                        alert('Failed to save executable architecture information. Please try again.');
+                                    }
+                                }
                             });
                         }
                         
@@ -803,4 +918,4 @@ async function initDxvkGplasyncTab() {
         console.error('Error getting DXVK-gplasync releases:', error);
         gplasyncContainer.innerHTML = `<p>Error loading DXVK-gplasync releases: ${error.message}</p>`;
     }
-} 
+}
