@@ -37,7 +37,9 @@ jobs:
             chore
             revert
           requireScope: false
-          subjectPattern: ^(?![A-Z]).+$
+          subjectPattern: ^[A-Za-z].+$
           subjectPatternError: |
-            The subject must start with a capital letter.
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            starts with an uppercase character.
           validateSingleCommit: true

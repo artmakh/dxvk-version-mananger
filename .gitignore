@@ -135,8 +135,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Electron build
-assets/
-
 # Electron Forge build output
 out/
