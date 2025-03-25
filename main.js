@@ -579,3 +579,35 @@ ipcMain.handle('get-game-dxvk-status', async (event, gameId) => {
     };
   }
 });
+
+// IPC handler for saving custom game metadata
+ipcMain.handle('save-custom-game-metadata', async (event, gameId, metadataUpdates) => {
+  try {
+    console.log(`save-custom-game-metadata IPC handler called for game ${gameId}`);
+    console.log('Metadata updates:', metadataUpdates);
+    
+    if (!gameId) {
+      return { success: false, message: 'Game ID is required' };
+    }
+    
+    // Save the custom metadata
+    const result = await gameMetadata.saveCustomGameMetadata(gameId, metadataUpdates);
+    
+    // Find the game to get its name for display purpose
+    const game = steamGames.find(g => g.appid === gameId);
+    const gameName = game ? game.name : `Game ${gameId}`;
+    
+    console.log(`Custom metadata saved for ${gameName}:`, result);
+    
+    return {
+      success: result.success,
+      message: result.success ? `Successfully updated metadata for ${gameName}` : result.message
+    };
+  } catch (error) {
+    console.error(`Error saving custom metadata for game ${gameId}:`, error);
+    return { 
+      success: false, 
+      message: `Error saving custom metadata: ${error.message}` 
+    };
+  }
+});

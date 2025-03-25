@@ -274,7 +274,9 @@ function createDefaultMetadata(gameInstallDir = null) {
     executable32bit: 'Unknown',
     executable64bit: 'Unknown',
     vulkanVersions: null,
-    installDir: gameInstallDir || null
+    installDir: gameInstallDir || null,
+    custom_d3d: false,
+    custom_exec: false
   };
 }
 
@@ -404,6 +406,45 @@ function cleanupUninstalledGamesMetadata(installedGames) {
   }
 }
 
+/**
+ * Save custom metadata for a game
+ * @param {string} appId The Steam app ID
+ * @param {Object} customMetadata The custom metadata to save
+ * @returns {Object} Result indicating success or failure
+ */
+async function saveCustomGameMetadata(appId, customMetadata) {
+  try {
+    console.log(`Saving custom metadata for game ${appId}:`, customMetadata);
+    
+    // Load existing metadata
+    let metadata = loadMetadataFromCache(appId);
+    
+    if (!metadata) {
+      console.log(`No existing metadata found for game ${appId}, creating default`);
+      metadata = createDefaultMetadata();
+    }
+    
+    // Merge custom metadata with existing metadata
+    Object.assign(metadata, customMetadata);
+    
+    // Save the updated metadata
+    saveMetadataToCache(appId, metadata);
+    
+    console.log(`Successfully saved custom metadata for game ${appId}`);
+    
+    return {
+      success: true,
+      message: 'Metadata saved successfully'
+    };
+  } catch (error) {
+    console.error(`Error saving custom metadata for game ${appId}:`, error);
+    return {
+      success: false,
+      message: `Error saving metadata: ${error.message}`
+    };
+  }
+}
+
 // Export functions
 module.exports = {
   initCacheDirs,
@@ -413,5 +454,6 @@ module.exports = {
   getDxvkInfoForGame,
   saveMetadataToCache,
   loadMetadataFromCache,
-  cleanupUninstalledGamesMetadata
+  cleanupUninstalledGamesMetadata,
+  saveCustomGameMetadata
 }; 
