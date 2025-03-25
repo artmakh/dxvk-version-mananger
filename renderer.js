@@ -153,15 +153,15 @@ async function initInstalledGamesTab() {
                                         Patched with ${dxvkStatus.dxvk_type} ${dxvkStatus.dxvk_version}
                                     </span>
                                 </div>`;
-                                    
-                                    if (dxvkStatus.backuped) {
-                                        additionalDetails += `
-                                            <div class="detail-row">
-                                                <span class="detail-label">DLL Backup:</span>
-                                                <span class="detail-value backup-exists">Yes</span>
-                                            </div>`;
-                                    }
-                                }
+                            
+                            if (dxvkStatus.backuped) {
+                                additionalDetails += `
+                                    <div class="detail-row">
+                                        <span class="detail-label">DLL Backup:</span>
+                                        <span class="detail-value backup-exists">Yes</span>
+                                    </div>`;
+                            }
+                        }
                         
                         // Only show the button for non-Vulkan games
                         let buttonHtml = '';
@@ -172,8 +172,8 @@ async function initInstalledGamesTab() {
                             buttonHtml = '<div class="buttons-container">';
                             buttonHtml += `<button class="${buttonClass}" data-game-id="${game.appid}" ${!hasCompleteInfo ? 'disabled' : ''}>${buttonText}</button>`;
                             
-                            // Add restore button if game has backups
-                            if (dxvkStatus && dxvkStatus.patched && dxvkStatus.backuped) {
+                            // Add restore button if game has DXVK installed (patched), regardless of backup status
+                            if (dxvkStatus && dxvkStatus.patched) {
                                 buttonHtml += `<button class="restore-btn" data-game-id="${game.appid}">Restore Original Files</button>`;
                             }
                             
@@ -202,33 +202,41 @@ async function initInstalledGamesTab() {
                         const restoreBtn = gameCard.querySelector('.restore-btn');
                         if (restoreBtn) {
                             restoreBtn.addEventListener('click', async (e) => {
+                                e.preventDefault();
                                 const gameId = e.target.getAttribute('data-game-id');
-                                console.log(`Restoring original DLLs for game with ID: ${gameId}`);
+                                const game = steamGames.find(g => g.appid === gameId);
                                 
-                                // Show confirmation dialog
                                 if (confirm(`Are you sure you want to restore the original DLL files for ${game.name}? This will remove DXVK.`)) {
-                                    // Disable button and show loading state
-                                    restoreBtn.disabled = true;
-                                    restoreBtn.textContent = 'Restoring...';
-                                    restoreBtn.classList.add('loading');
-                                    
                                     try {
-                                        // Call the main process to restore original DLLs
-                                        const result = await window.electronAPI.restoreOriginalDlls(gameId);
+                                        restoreBtn.disabled = true;
+                                        restoreBtn.textContent = 'Restoring...';
+                                        restoreBtn.classList.add('loading');
+                                        
+                                        // Check if backup exists
+                                        const hasBackup = await window.electronAPI.checkBackupExists(metadata.installDir);
+                                        let result;
+                                        
+                                        if (hasBackup) {
+                                            // If backup exists, restore from it
+                                            console.log(`Backup exists for ${game.name}, restoring from backup...`);
+                                            result = await window.electronAPI.restoreOriginalDlls(game);
+                                        } else {
+                                            // If no backup exists, just remove the DXVK DLLs
+                                            console.log(`No backup found for ${game.name}, removing DXVK DLLs directly...`);
+                                            result = await window.electronAPI.removeDxvkFromGame(game);
+                                        }
                                         
                                         if (result.success) {
-                                            alert(`Successfully restored original DLL files for ${game.name}. DXVK has been removed.`);
-                                            // Refresh the game list to update UI
-                                            initInstalledGamesTab();
+                                            alert(`Successfully ${hasBackup ? 'restored original DLL files' : 'removed DXVK DLLs'} for ${game.name}.`);
+                                            // Refresh the games list to show updated status
+                                            await initInstalledGamesTab();
                                         } else {
-                                            alert(`Error restoring files: ${result.message}`);
-                                            restoreBtn.disabled = false;
-                                            restoreBtn.textContent = 'Restore Original Files';
-                                            restoreBtn.classList.remove('loading');
+                                            alert(`Error: ${result.message}`);
                                         }
                                     } catch (error) {
-                                        console.error('Error restoring original DLLs:', error);
-                                        alert(`Error restoring files: ${error.message}`);
+                                        console.error('Error restoring/removing DLLs:', error);
+                                        alert(`Error: ${error.message}`);
+                                    } finally {
                                         restoreBtn.disabled = false;
                                         restoreBtn.textContent = 'Restore Original Files';
                                         restoreBtn.classList.remove('loading');

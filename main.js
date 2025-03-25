@@ -511,6 +511,44 @@ ipcMain.handle('restore-original-dlls', async (event, gameId) => {
   }
 });
 
+// IPC handler for checking backup existence
+ipcMain.handle('check-backup-exists', async (event, gameDir) => {
+  try {
+    console.log(`check-backup-exists IPC handler called for directory ${gameDir}`);
+    
+    // Check if backup exists
+    const exists = await dxvkManager.checkBackupExists(gameDir);
+    console.log(`Backup exists for ${gameDir}: ${exists}`);
+    
+    return exists;
+  } catch (error) {
+    console.error('Error checking backup existence:', error);
+    return false;
+  }
+});
+
+// IPC handler for removing DXVK without backup
+ipcMain.handle('remove-dxvk-from-game', async (event, gameId) => {
+  try {
+    console.log(`remove-dxvk-from-game IPC handler called for game ${gameId}`);
+    const game = steamGames.find(g => g.appid === gameId);
+    if (!game) {
+      return { success: false, message: `Game with ID ${gameId} not found` };
+    }
+    
+    // Get the metadata for the game
+    const metadata = await gameMetadata.getGameMetadata(gameId, game.name, game.path);
+    
+    // Remove DXVK DLLs without backup
+    const result = await dxvkManager.removeDxvkFromGame(game, metadata);
+    
+    return result;
+  } catch (error) {
+    console.error('Error removing DXVK from game:', error);
+    return { success: false, message: `Error removing DXVK DLLs: ${error.message}` };
+  }
+});
+
 // IPC handler for getting DXVK status for a game
 ipcMain.handle('get-game-dxvk-status', async (event, gameId) => {
   console.log(`get-game-dxvk-status IPC handler called for game ${gameId}`);
