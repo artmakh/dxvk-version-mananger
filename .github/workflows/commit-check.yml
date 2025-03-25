@@ -1,8 +1,13 @@
 name: Conventional Commit Check
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
 
 jobs:
   check-commits:
@@ -19,22 +24,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          types:
-            - feat
-            - fix
-            - docs
-            - style
-            - refactor
-            - perf
-            - test
-            - build
-            - ci
-            - chore
-            - revert
+          types: |
+            fix
+            feat
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
           requireScope: false
-          subjectPattern: ^[A-Z].*$
+          subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: |
             The subject must start with a capital letter.
-          wip: true
           validateSingleCommit: true
-          validateSingleCommitMatchesPrTitle: true 

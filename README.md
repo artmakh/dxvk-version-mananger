@@ -1,8 +1,8 @@
 # DXVK Version Manager
 
-![Build Status](https://github.com/artmakh/dxvk-version-mananger/workflows/Build%20and%20Release/badge.svg)
+![Build Status](https://img.shields.io/github/actions/workflow/status/artmakh/dxvk-version-mananger/release-please.yml)
 ![Release](https://img.shields.io/github/v/release/artmakh/dxvk-version-mananger)
-![GitHub License](https://img.shields.io/github/license/artmakh/dxvk-version-mananger)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Windows utility to manage versions of DXVK in installed games.
 
