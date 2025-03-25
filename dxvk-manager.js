@@ -460,11 +460,112 @@ async function restoreOriginalDlls(game, metadata) {
   }
 }
 
+/**
+ * Check if backup exists for a game
+ * @param {string} gameDir Game installation directory
+ * @returns {boolean} Whether backup exists
+ */
+async function checkBackupExists(gameDir) {
+  try {
+    // Look for any .bkp files in the game directory
+    const files = await fs.promises.readdir(gameDir);
+    return files.some(file => file.endsWith('.bkp'));
+  } catch (error) {
+    console.error('Error checking for backup files:', error);
+    return false;
+  }
+}
+
+/**
+ * Remove DXVK DLLs from a game without restoring from backup
+ * @param {Object} game Game object with metadata
+ * @param {Object} metadata Game metadata
+ * @returns {Object} Result with success status and message
+ */
+async function removeDxvkFromGame(game, metadata) {
+  try {
+    console.log(`Removing DXVK DLL files for ${game.name}...`);
+    
+    // Get the game installation directory
+    const gameDir = metadata.installDir;
+    if (!gameDir || !fs.existsSync(gameDir)) {
+      return { 
+        success: false, 
+        message: `Game installation directory not found: ${gameDir}`
+      };
+    }
+    
+    // Determine required DLLs based on Direct3D version
+    const { requiredDlls } = getDllsForDirectXVersion(metadata.direct3dVersions);
+    console.log(`Game uses DirectX, requires DLLs:`, requiredDlls);
+    
+    // Track deleted DLLs
+    const deletedDlls = [];
+    
+    // For each required DLL, check if it exists and delete it
+    for (const dll of requiredDlls) {
+      const dllPath = path.join(gameDir, dll);
+      
+      if (fs.existsSync(dllPath)) {
+        try {
+          fs.unlinkSync(dllPath);
+          console.log(`Removed DXVK DLL: ${dllPath}`);
+          deletedDlls.push(dll);
+        } catch (error) {
+          console.error(`Error removing ${dll}:`, error);
+        }
+      } else {
+        console.log(`DLL not found: ${dllPath}`);
+      }
+    }
+    
+    // Update metadata
+    if (deletedDlls.length > 0) {
+      metadata.patched = false;
+      metadata.dxvk_version = null;
+      metadata.dxvk_type = null;
+      metadata.dxvk_timestamp = null;
+      
+      // Try to save the updated metadata
+      try {
+        if (typeof global.saveGameMetadata === 'function') {
+          await global.saveGameMetadata(game.appid, metadata);
+          console.log(`Updated metadata for ${game.name} after removing DXVK DLLs`);
+        } else {
+          console.warn('saveGameMetadata function not available, metadata changes will not be persisted');
+        }
+      } catch (error) {
+        console.error('Error saving updated metadata:', error);
+      }
+      
+      return {
+        success: true,
+        message: `Successfully removed ${deletedDlls.length} DXVK DLLs for ${game.name}`,
+        deletedDlls
+      };
+    } else {
+      return {
+        success: false,
+        message: `No DXVK DLLs found to remove for ${game.name}`
+      };
+    }
+    
+  } catch (error) {
+    console.error('Error removing DXVK DLLs:', error);
+    return {
+      success: false,
+      message: `Error removing DXVK DLLs: ${error.message}`
+    };
+  }
+}
+
 module.exports = {
   applyDxvkToGame,
   getInstalledDxvkVersions,
   getDllsForDirectXVersion,
   getArchSubfolder,
   checkExistingDlls,
-  restoreOriginalDlls
+  restoreOriginalDlls,
+  checkBackupExists,
+  removeDxvkFromGame
 }; 

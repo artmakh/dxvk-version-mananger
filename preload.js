@@ -27,7 +27,11 @@ contextBridge.exposeInMainWorld(
       
     // Game DXVK status
     getGameDxvkStatus: (gameId) => ipcRenderer.invoke('get-game-dxvk-status', gameId),
-    restoreOriginalDlls: (appId) => ipcRenderer.invoke('restore-original-dlls', appId)
+    restoreOriginalDlls: (game) => ipcRenderer.invoke('restore-original-dlls', game.appid),
+    
+    // New functions for enhanced DLL management
+    checkBackupExists: (gameDir) => ipcRenderer.invoke('check-backup-exists', gameDir),
+    removeDxvkFromGame: (game) => ipcRenderer.invoke('remove-dxvk-from-game', game.appid)
   }
 );
 
