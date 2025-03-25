@@ -6,6 +6,8 @@
 
 A Windows utility to manage versions of DXVK in installed games.
 
+![](assets/screen.gif)
+
 ## Features
 
 - **Steam Game Integration**: Automatically detects installed Steam games
