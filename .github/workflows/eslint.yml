@@ -1,0 +1,31 @@
+name: Lint
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Run Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint for a nested project with changed files and .eslintignore
+        uses: tj-actions/eslint-changed-files@0cfcd35949a961d13e964a7c2a4971c0e89b68fc # v25.3.1
+        with:
+          config_path: ".eslintrc.json"
+          extra_args: "--ext .js"

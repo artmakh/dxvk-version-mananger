@@ -7,6 +7,7 @@ Fixes # (issue number)
 ## Type of change
 
 <!-- Please delete options that are not relevant and/or add your own -->
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
@@ -39,6 +40,7 @@ Please ensure your PR title follows the [Conventional Commits](https://www.conve
 ```
 
 Common types:
+
 - feat: A new feature
 - fix: A bug fix
 - docs: Documentation changes
@@ -47,4 +49,4 @@ Common types:
 - perf: Performance improvements
 - test: Adding or fixing tests
 - chore: Changes to the build process or auxiliary tools
-- revert: Revert a previous commit 
+- revert: Revert a previous commit

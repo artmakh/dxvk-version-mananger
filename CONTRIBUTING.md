@@ -85,4 +85,4 @@ Please note that this project adheres to a Code of Conduct. By participating, yo
 
 ## Questions?
 
-If you have any questions or need help, please open an issue on GitHub. 
+If you have any questions or need help, please open an issue on GitHub.

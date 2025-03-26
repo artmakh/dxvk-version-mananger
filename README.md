@@ -6,7 +6,7 @@
 
 A Windows utility to manage versions of DXVK in installed games.
 
-![](assets/screen.gif)
+[![Watch the video](.github/demo-preview.png)](https://github.com/artmakh/dxvk-version-mananger/blob/main/.github/demo.mp4)
 
 ## Features
 
@@ -37,11 +37,8 @@ cd dxvk-version-mananger
 # Install dependencies
 npm install
 
-# Start the application in development mode
-npm start
-
 # Create a distribution package
-npm run make
+npm run build
 ```
 
 ## Usage
@@ -83,3 +80,31 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/) s
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Development
+
+### Project Structure
+
+The project follows a standard Electron application structure:
+
+```
+dxvk-version-manager/
+├── src/
+│   ├── main/             # Main process files
+│   ├── renderer/         # Renderer process files
+│   │   ├── assets/       # Images and other assets
+│   │   ├── styles/       # CSS files
+│   ├── preload/          # Preload scripts
+│   └── common/           # Shared code between processes
+├── .eslintrc.json        # ESLint configuration
+├── .prettierrc           # Prettier configuration
+└── package.json          # Project metadata and dependencies
+```
+
+### Development Scripts
+
+- `npm start` - Start the application in development mode
+- `npm run lint` - Run ESLint to check code quality
+- `npm run lint:fix` - Run ESLint and automatically fix issues
+- `npm run format` - Run Prettier to format code
+- `npm run build` - Create distribution packages for the application
