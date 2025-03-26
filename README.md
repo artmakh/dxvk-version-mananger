@@ -6,7 +6,7 @@
 
 A Windows utility to manage versions of DXVK in installed games.
 
-[![Watch the video](.github/demo-preview.png)](https://github.com/artmakh/dxvk-version-mananger/blob/main/.github/demo.mp4)
+![](https://github.com/artmakh/dxvk-version-mananger/blob/main/.github/demo.gif)
 
 ## Features
 
@@ -21,9 +21,8 @@ A Windows utility to manage versions of DXVK in installed games.
 ### Option 1: Download the Latest Release
 
 1. Go to the [Releases page](https://github.com/artmakh/dxvk-version-mananger/releases)
-2. Download the latest `DXVK.Version.Manager-win32-x64-[version].zip` file
-3. Extract the ZIP file to a location of your choice
-4. Run `DXVK Version Manager.exe` inside the extracted folder
+2. Download the latest `DXVK-Version-Manager-[version].exe` file
+4. Run `DXVK-Version-Manager-[version].exe` inside the extracted folder
 
 ### Option 2: Build from Source
 
@@ -54,33 +53,6 @@ npm run build
 
 To revert back to original files, click the "Restore Original Files" button on games that have backups.
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Commit Message Format
-
-This project uses [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages:
-
-- `feat:` - A new feature
-- `fix:` - A bug fix
-- `docs:` - Documentation changes
-- `style:` - Changes that do not affect the meaning of the code
-- `refactor:` - Code changes that neither fix a bug nor add a feature
-- `perf:` - Performance improvements
-- `test:` - Adding or correcting tests
-- `chore:` - Changes to the build process or auxiliary tools
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Development
 
 ### Project Structure
@@ -108,3 +80,30 @@ dxvk-version-manager/
 - `npm run lint:fix` - Run ESLint and automatically fix issues
 - `npm run format` - Run Prettier to format code
 - `npm run build` - Create distribution packages for the application
+
+### Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Commit Message Format
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages:
+
+- `feat:` - A new feature
+- `fix:` - A bug fix
+- `docs:` - Documentation changes
+- `style:` - Changes that do not affect the meaning of the code
+- `refactor:` - Code changes that neither fix a bug nor add a feature
+- `perf:` - Performance improvements
+- `test:` - Adding or correcting tests
+- `chore:` - Changes to the build process or auxiliary tools
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
