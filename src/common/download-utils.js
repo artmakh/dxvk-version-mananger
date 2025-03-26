@@ -135,31 +135,34 @@ function extractTarGz(filePath, destination) {
       const tar = require('tar');
 
       console.log('Using tar package for extraction');
-      
-      tar.extract({
-        file: filePath,
-        cwd: destination,
-        sync: false,
-        onentry: entry => {
-          console.log(`Extracting: ${entry.path}`);
-        }
-      }).then(() => {
-        console.log('Extraction complete using tar package');
-        // Delete the downloaded tar.gz file after successful extraction
-        if (fs.existsSync(filePath)) {
-          try {
-            fs.unlinkSync(filePath);
-            console.log(`Removed tar.gz file: ${filePath}`);
-          } catch (err) {
-            console.error(`Warning: Failed to delete tar.gz file: ${err.message}`);
+
+      tar
+        .extract({
+          file: filePath,
+          cwd: destination,
+          sync: false,
+          onentry: entry => {
+            console.log(`Extracting: ${entry.path}`);
+          },
+        })
+        .then(() => {
+          console.log('Extraction complete using tar package');
+          // Delete the downloaded tar.gz file after successful extraction
+          if (fs.existsSync(filePath)) {
+            try {
+              fs.unlinkSync(filePath);
+              console.log(`Removed tar.gz file: ${filePath}`);
+            } catch (err) {
+              console.error(`Warning: Failed to delete tar.gz file: ${err.message}`);
+            }
           }
-        }
-        resolve();
-      }).catch(err => {
-        console.error('Tar package extraction error:', err);
-        // If tar package fails, try external commands as fallbacks
-        tryExternalCommands().then(resolve).catch(reject);
-      });
+          resolve();
+        })
+        .catch(err => {
+          console.error('Tar package extraction error:', err);
+          // If tar package fails, try external commands as fallbacks
+          tryExternalCommands().then(resolve).catch(reject);
+        });
     } catch (error) {
       console.error('Error setting up tar package extraction:', error);
       // If Node.js modules approach fails, try external commands
@@ -416,7 +419,9 @@ async function downloadAndExtractDxvkPackage(version, downloadUrl, cacheDir, ver
     // The extractTarGz function handles deleting the file, so we only check if
     // it somehow still exists as a fallback
     if (fs.existsSync(downloadPath)) {
-      console.log(`Cleanup: tar.gz file still exists, this shouldn't happen as extractTarGz should have deleted it`);
+      console.log(
+        `Cleanup: tar.gz file still exists, this shouldn't happen as extractTarGz should have deleted it`
+      );
     }
 
     console.log(`Successfully downloaded and extracted version ${version}`);
@@ -486,5 +491,5 @@ module.exports = {
   downloadFile,
   extractTarGz,
   downloadAndExtractDxvkPackage,
-  getDxvkFilesFromDir
-}; 
+  getDxvkFilesFromDir,
+};

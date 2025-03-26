@@ -1,12 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { 
-  downloadFile,
-  extractTarGz,
-  downloadAndExtractDxvkPackage,
-  getDxvkFilesFromDir
-} = require('./download-utils');
+const { downloadAndExtractDxvkPackage, getDxvkFilesFromDir } = require('./download-utils');
 
 // Global cache directory paths
 let gplasyncCacheDir;
@@ -142,7 +137,7 @@ async function downloadGplasyncVersion(version, downloadUrl) {
   // Create a safe directory name from the version (remove "v" prefix from the version as well)
   const safeVersion = version.replace(/^v/, '').replace(/[/\\]/g, '-');
   const versionDir = path.join(gplasyncCacheDir, safeVersion);
-  
+
   // Use the common function to handle the download and extraction
   return downloadAndExtractDxvkPackage(version, downloadUrl, gplasyncCacheDir, versionDir);
 }
@@ -152,7 +147,7 @@ function getGplasyncFiles(version) {
   // Create a safe directory name from the version (remove "v" prefix from the version as well)
   const safeVersion = version.replace(/^v/, '').replace(/[/\\]/g, '-');
   const versionDir = path.join(gplasyncCacheDir, safeVersion);
-  
+
   // Use the common function to get the files
   return getDxvkFilesFromDir(versionDir);
 }

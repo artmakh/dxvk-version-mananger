@@ -1,12 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { 
-  downloadFile,
-  extractTarGz,
-  downloadAndExtractDxvkPackage,
-  getDxvkFilesFromDir
-} = require('./download-utils');
+const { downloadAndExtractDxvkPackage, getDxvkFilesFromDir } = require('./download-utils');
 
 // Global cache directory paths
 let dxvkCacheDir;
