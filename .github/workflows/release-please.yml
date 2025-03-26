@@ -18,6 +18,8 @@ jobs:
         id: release
         with:
           release-type: node
+          manifest-file: .github/release-please-manifest.json
+          config-file: .github/release-please-config.json
           token: ${{ secrets.RELEASE_PLEASE }}
 
   build-and-release:

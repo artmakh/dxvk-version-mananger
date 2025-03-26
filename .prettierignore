@@ -1,0 +1,10 @@
+# Ignore artifacts:
+out
+
+# Ignore all HTML files:
+**/*.html
+
+# Ignore github files:
+CHANGELOG.md
+release-please-config.json
+.github/**
