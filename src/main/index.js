@@ -6,11 +6,6 @@ const dxvkVersions = require('../common/dxvk-versions.js');
 const dxvkGplasync = require('../common/dxvk-gplasync.js');
 const dxvkManager = require('../common/dxvk-manager.js');
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling
-if (require('electron-squirrel-startup')) {
-  app.quit();
-}
-
 // Keep a global reference of the window object to prevent it from being garbage collected
 let mainWindow;
 let steamGames = [];

@@ -37,11 +37,8 @@ cd dxvk-version-mananger
 # Install dependencies
 npm install
 
-# Start the application in development mode
-npm start
-
 # Create a distribution package
-npm run make
+npm run build
 ```
 
 ## Usage
@@ -110,5 +107,4 @@ dxvk-version-manager/
 - `npm run lint` - Run ESLint to check code quality
 - `npm run lint:fix` - Run ESLint and automatically fix issues
 - `npm run format` - Run Prettier to format code
-- `npm run package` - Package the application for distribution
-- `npm run make` - Create distribution packages for the application
+- `npm run build` - Create distribution packages for the application

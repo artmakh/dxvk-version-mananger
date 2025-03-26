@@ -5,13 +5,12 @@
   "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
-    "start:forge": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
     "lint": "eslint --ext .js . --config .eslintrc.json",
     "lint:fix": "eslint --ext .js . --fix --config .eslintrc.json",
-    "format": "prettier --write \"**/*.{js,jsx,json,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "build": "electron-builder build --win portable zip --config.win.signAndEditExecutable=false",
+    "build:portable": "electron-builder build --win portable --config.win.signAndEditExecutable=false",
+    "build:zip": "electron-builder build --win zip --config.win.signAndEditExecutable=false"
   },
   "repository": {
     "type": "git",
@@ -28,10 +27,9 @@
   "author": "DXVK Version Manager Contributors",
   "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^7.2.0",
-    "@electron-forge/maker-zip": "^7.2.0",
     "@eslint/js": "^9.23.0",
     "electron": "^35.0.3",
+    "electron-builder": "^25.1.8",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.5",
@@ -39,29 +37,27 @@
     "prettier": "^3.5.3"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
     "tar": "^7.4.3"
   },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "asar": true,
-        "name": "DXVK Version Manager",
-        "platform": "win32",
-        "arch": "x64",
-        "icon": "src/renderer/assets/icon.ico",
-        "extraResource": [
-          "src/renderer/assets"
-        ]
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "win32"
-          ]
-        }
-      ]
+  "build": {
+    "appId": "com.github.artmakh.dxvk-version-manager",
+    "productName": "DXVK Version Manager",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      "src/renderer/assets"
+    ],
+    "win": {
+      "target": [
+        "portable",
+        "zip"
+      ],
+      "icon": "src/renderer/assets/icon.ico"
+    },
+    "portable": {
+      "artifactName": "DXVK-Version-Manager-${version}.exe"
     }
   }
 }
