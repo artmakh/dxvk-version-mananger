@@ -1,5 +1,8 @@
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Make the checkAspectRatio function available globally
+  window.checkAspectRatio = checkAspectRatio;
+
   // Get all tab buttons and tab panes
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
@@ -25,6 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
   initDxvkVersionsTab();
   initDxvkGplasyncTab();
 });
+
+// Function to check image aspect ratio and add appropriate class
+function checkAspectRatio(img) {
+  // Add event listener for when the image is fully loaded
+  if (img.complete) {
+    applyAspectRatioClass(img);
+  } else {
+    img.addEventListener('load', () => applyAspectRatioClass(img));
+  }
+}
+
+// Apply the appropriate class based on aspect ratio
+function applyAspectRatioClass(img) {
+  // Clear any existing aspect ratio classes
+  img.classList.remove('cover-portrait', 'cover-square', 'cover-landscape');
+
+  // Calculate the aspect ratio (width/height)
+  const aspectRatio = img.naturalWidth / img.naturalHeight;
+
+  // Classify the image based on its aspect ratio
+  if (aspectRatio <= 0.75) {
+    // Portrait images (2:3 = 0.667 and similar)
+    // This includes Steam's typical 600x900 covers (0.667)
+    img.classList.add('cover-portrait');
+  } else if (aspectRatio >= 0.9 && aspectRatio <= 1.1) {
+    // Square or nearly square images
+    img.classList.add('cover-square');
+  } else if (aspectRatio > 1.1) {
+    // Landscape images
+    img.classList.add('cover-landscape');
+  }
+
+  // Log the aspect ratio for debugging
+  console.log(
+    `Image aspect ratio: ${aspectRatio.toFixed(2)} - Classified as: ${img.className.split(' ').pop()}`
+  );
+}
 
 // Save custom game metadata
 async function saveCustomGameMetadata(gameId, metadataUpdates) {
@@ -59,9 +99,9 @@ async function initInstalledGamesTab() {
   const gamesContainer = document.querySelector('#installed-games .content-area');
   gamesContainer.innerHTML = '<p>Loading Steam games...</p>';
 
-  // Simple placeholder image as data URL
+  // Create a more sophisticated placeholder image with game controller icon
   const placeholderImage =
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGZpbGw9IiM5OTk5OTkiPk5vIEltYWdlIEF2YWlsYWJsZTwvdGV4dD48L3N2Zz4=';
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI2MCwgMTAwKSI+PHBhdGggZD0iTTY2LjA4IDIwLjM2QzU5LjU2IDguOTkgNTAuMDIgMC4wMSAzOS45OCAwLjAxQzI5LjkzIDAuMDEgMjAuMzkgOC45OSAxMy44NyAyMC4zNkM0LjkxIDE5LjE2IC0xLjg1IDI4LjA5IDAuNDkgMzYuODhDMi41OSA0NS4xMiAxMi4wOSA0OS41MiAyMC41NSA0NS43N0MyNi4yMiA0My40IDMyLjk2IDQxLjU2IDM5Ljk4IDQxLjU2QzQ2Ljk5IDQxLjU2IDUzLjc0IDQzLjQgNTkuNDEgNDUuNzdDNjcuODcgNDkuNTMgNzcuMzcgNDUuMTMgNzkuNDcgMzYuODhDODEuOCAyOC4wOSA3NS4wNSAxOS4xNiA2Ni4wOCAyMC4zNlpNMjYuMzIgMjcuMDJDMjMuMTQgMjcuMDIgMjAuNTUgMjQuNDQgMjAuNTUgMjEuMjZDMjAuNTUgMTguMDggMjMuMTQgMTUuNSAyNi4zMiAxNS41QzI5LjQ5IDE1LjUgMzIuMDggMTguMDggMzIuMDggMjEuMjZDMzIuMDggMjQuNDQgMjkuNDkgMjcuMDIgMjYuMzIgMjcuMDJaTTUzLjY0IDI3LjAyQzUwLjQ3IDI3LjAyIDQ3Ljg4IDI0LjQ0IDQ3Ljg4IDIxLjI2QzQ3Ljg4IDE4LjA4IDUwLjQ3IDE1LjUgNTMuNjQgMTUuNUM1Ni44MSAxNS41IDU5LjQgMTguMDggNTkuNCAyMS4yNkM1OS40IDI0LjQ0IDU2LjgxIDI3LjAyIDUzLjY0IDI3LjAyWiIgZmlsbD0iI2RkZGRlMCIvPjwvZz48dGV4dCB4PSI1MCUiIHk9IjIxNSIgZm9udC1mYW1pbHk9IkludGVyLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY0NzQ4YiI+R2FtZSBJbWFnZSBOb3QgQXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg==';
 
   try {
     // Verify the electronAPI exists before calling it
@@ -132,7 +172,7 @@ async function initInstalledGamesTab() {
           if (gameCard) {
             const gameDetails = `
                             <div class="game-cover">
-                                <img src="${coverUrl}" alt="${game.name}" onerror="this.src='${placeholderImage}'">
+                                <img src="${coverUrl}" alt="${game.name}" onerror="this.src='${placeholderImage}'" onload="checkAspectRatio(this)">
                             </div>
                             <div class="game-info">
                                 <h3>${game.name}</h3>
@@ -237,16 +277,28 @@ async function initInstalledGamesTab() {
               // 2. We have both custom_d3d and custom_exec (user has selected both values)
               const hasCompletedCustomInfo =
                 metadata.custom_d3d === true && metadata.custom_exec === true;
-              const buttonClass =
+              const isPatched = dxvkStatus && dxvkStatus.patched;
+              const buttonText = isPatched ? 'Update DXVK' : 'Manage DXVK';
+
+              let buttonClass =
                 hasCompleteInfo || hasCompletedCustomInfo ? 'action-btn' : 'action-btn disabled';
-              const buttonText = dxvkStatus && dxvkStatus.patched ? 'Update DXVK' : 'Manage DXVK';
+              // Add update-btn class if the game is already patched with DXVK
+              if (isPatched) {
+                buttonClass += ' update-btn';
+              }
 
               buttonHtml = '<div class="buttons-container">';
-              buttonHtml += `<button class="${buttonClass}" data-game-id="${game.appid}" ${!hasCompleteInfo && !hasCompletedCustomInfo ? 'disabled' : ''}>${buttonText}</button>`;
+              // Add a small refresh icon if the button is for updating
+              const updateIcon = isPatched
+                ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>'
+                : '';
+              buttonHtml += `<button class="${buttonClass}" data-game-id="${game.appid}" ${!hasCompleteInfo && !hasCompletedCustomInfo ? 'disabled' : ''}>${updateIcon}${buttonText}</button>`;
 
               // Add restore button if game has DXVK installed (patched), regardless of backup status
-              if (dxvkStatus && dxvkStatus.patched) {
-                buttonHtml += `<button class="restore-btn" data-game-id="${game.appid}">Restore Original Files</button>`;
+              if (isPatched) {
+                const restoreIcon =
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>';
+                buttonHtml += `<button class="restore-btn" data-game-id="${game.appid}">${restoreIcon}Restore Original Files</button>`;
               }
 
               buttonHtml += '</div>';
@@ -430,21 +482,26 @@ async function showDxvkSelectionModal(gameId, gameName, metadata) {
       document.body.appendChild(modalOverlay);
     }
 
+    // Get the modal elements
+    modalOverlay.innerHTML = '';
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
     // Fetch installed DXVK versions
     const installedVersions = await window.electronAPI.getInstalledDxvkVersions();
 
     // Get current DXVK status
     const dxvkStatus = await window.electronAPI.getGameDxvkStatus(gameId);
 
-    // Create modal content
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
+    // Check if we have any installed versions
+    const noDxvkVersionsInstalled =
+      installedVersions.dxvk.length === 0 && installedVersions.dxvkGplasync.length === 0;
 
     // Create modal header
     const modalHeader = document.createElement('div');
     modalHeader.className = 'modal-header';
     modalHeader.innerHTML = `
-            <h3>${dxvkStatus && dxvkStatus.patched ? 'Update' : 'Apply'} DXVK to ${gameName}</h3>
+            <h3>${noDxvkVersionsInstalled ? 'No DXVK Versions Available' : dxvkStatus && dxvkStatus.patched ? 'Update' : 'Apply'} ${noDxvkVersionsInstalled ? '' : 'DXVK to'} ${gameName}</h3>
             <button class="modal-close-btn">&times;</button>
         `;
 
@@ -453,28 +510,29 @@ async function showDxvkSelectionModal(gameId, gameName, metadata) {
     modalBody.className = 'modal-body';
 
     // Check if we have installed versions
-    if (installedVersions.dxvk.length === 0 && installedVersions.dxvkGplasync.length === 0) {
+    if (noDxvkVersionsInstalled) {
       modalBody.innerHTML = `
-                <p class="no-versions-message">No DXVK versions installed!</p>
-                <p>Please go to the "DXVK Versions" or "DXVK-gplasync Versions" tab and download at least one version first.</p>
+                <div class="result-message warning">
+                    <h4>No DXVK Versions Installed</h4>
+                    <p>You need to download at least one DXVK version before you can apply it to games.</p>
+                </div>
+                <div class="download-instructions">
+                    <p>To download a DXVK version:</p>
+                    <ol>
+                        <li>Click on the <strong>"DXVK Versions"</strong> tab at the top of the window</li>
+                        <li>Find a version you'd like to use (latest is recommended)</li>
+                        <li>Click the <strong>"Download"</strong> button next to that version</li>
+                        <li>Wait for the download to complete</li>
+                        <li>Return to this game and try again</li>
+                    </ol>
+                </div>
+                <div class="download-navigation-buttons">
+                    <button class="go-to-dxvk-tab">Go to DXVK Versions Tab</button>
+                </div>
             `;
     } else {
       // Create version selection UI
       let versionSelectionHTML = '<div class="dxvk-selection-container">';
-
-      // If the game already has DXVK, show current status
-      if (dxvkStatus && dxvkStatus.patched) {
-        versionSelectionHTML += `
-                    <div class="current-dxvk-status">
-                        <h4>Current DXVK Status</h4>
-                        <div class="status-details">
-                            <p><strong>Version:</strong> ${dxvkStatus.dxvk_type} ${dxvkStatus.dxvk_version}</p>
-                            <p><strong>Backup:</strong> ${dxvkStatus.backuped ? 'Yes' : 'No'}</p>
-                            <p><strong>Applied:</strong> ${new Date(dxvkStatus.dxvk_timestamp).toLocaleString()}</p>
-                        </div>
-                    </div>
-                `;
-      }
 
       // Display DXVK versions if available
       if (installedVersions.dxvk.length > 0) {
@@ -538,19 +596,31 @@ async function showDxvkSelectionModal(gameId, gameName, metadata) {
 
       versionSelectionHTML += '</div>';
 
-      // Game info section
+      // Game info section - now including current DXVK status if patched
       versionSelectionHTML += `
                 <div class="game-info-section">
                     <h4>Game Information</h4>
                     <div class="game-info-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Direct3D:</span>
-                            <span class="detail-value">${metadata.direct3dVersions || 'Unknown'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Architecture:</span>
-                            <span class="detail-value">${metadata.executable64bit === 'true' ? '64-bit' : metadata.executable32bit === 'true' ? '32-bit' : 'Unknown'}</span>
-                        </div>
+                        <div>Direct3D:</div>
+                        <div>${metadata.direct3dVersions || 'Unknown'}</div>
+                        
+                        <div>Architecture:</div>
+                        <div>${metadata.executable64bit === 'true' ? '64-bit' : metadata.executable32bit === 'true' ? '32-bit' : 'Unknown'}</div>`;
+
+      // Include current DXVK status if the game is patched
+      if (dxvkStatus && dxvkStatus.patched) {
+        versionSelectionHTML += `
+                        <div>Current DXVK:</div>
+                        <div>${dxvkStatus.dxvk_type} ${dxvkStatus.dxvk_version}</div>
+                        
+                        <div>Applied on:</div>
+                        <div>${new Date(dxvkStatus.dxvk_timestamp).toLocaleString()}</div>
+                        
+                        <div>Backup:</div>
+                        <div>${dxvkStatus.backuped ? 'Yes' : 'No'}</div>`;
+      }
+
+      versionSelectionHTML += `
                     </div>
                 </div>
             `;
@@ -562,19 +632,149 @@ async function showDxvkSelectionModal(gameId, gameName, metadata) {
     const modalFooter = document.createElement('div');
     modalFooter.className = 'modal-footer';
 
-    // Apply button is disabled initially
-    const applyBtn = document.createElement('button');
-    applyBtn.className = 'apply-dxvk-btn disabled';
-    applyBtn.textContent =
-      dxvkStatus && dxvkStatus.patched ? 'Update Selected Version' : 'Apply Selected Version';
-    applyBtn.disabled = true;
+    if (noDxvkVersionsInstalled) {
+      // Just a close button for the no versions case
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'cancel-btn';
+      closeBtn.textContent = 'Close';
+      modalFooter.appendChild(closeBtn);
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'cancel-btn';
-    cancelBtn.textContent = 'Cancel';
+      // Close button event
+      closeBtn.addEventListener('click', () => {
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+          modalOverlay.remove();
+        }, 300);
+      });
+    } else {
+      // Apply button is disabled initially
+      const applyBtn = document.createElement('button');
+      applyBtn.className = 'apply-dxvk-btn disabled';
+      applyBtn.textContent =
+        dxvkStatus && dxvkStatus.patched ? 'Update Selected Version' : 'Apply Selected Version';
+      applyBtn.disabled = true;
 
-    modalFooter.appendChild(applyBtn);
-    modalFooter.appendChild(cancelBtn);
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'cancel-btn';
+      cancelBtn.textContent = 'Cancel';
+
+      modalFooter.appendChild(applyBtn);
+      modalFooter.appendChild(cancelBtn);
+
+      // Cancel button event
+      cancelBtn.addEventListener('click', () => {
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+          modalOverlay.remove();
+        }, 300);
+      });
+
+      // Version selection
+      const versionItems = modalBody.querySelectorAll('.version-item');
+      let selectedVersion = null;
+      let selectedType = null;
+
+      versionItems.forEach(item => {
+        item.addEventListener('click', () => {
+          // Remove selected class from all items
+          versionItems.forEach(i => i.classList.remove('selected'));
+
+          // Add selected class to clicked item
+          item.classList.add('selected');
+
+          // Update selected version and type
+          selectedVersion = item.getAttribute('data-version');
+          selectedType = item.getAttribute('data-type');
+
+          // Enable apply button
+          applyBtn.classList.remove('disabled');
+          applyBtn.disabled = false;
+        });
+      });
+
+      // Apply button
+      applyBtn.addEventListener('click', async () => {
+        if (!selectedVersion || !selectedType) {
+          return;
+        }
+
+        // Disable the apply button and show loading state
+        applyBtn.disabled = true;
+        applyBtn.textContent = 'Applying...';
+        applyBtn.classList.add('loading');
+
+        try {
+          // Apply DXVK to the game
+          const result = await window.electronAPI.applyDxvkToGame(
+            gameId,
+            selectedType,
+            selectedVersion
+          );
+
+          // Update modal to show result
+          modalBody.innerHTML = '';
+
+          if (result.success) {
+            // Success message
+            modalBody.innerHTML = `
+                            <div class="result-message success">
+                                <h4>Success!</h4>
+                                <p>${result.message}</p>
+                                ${result.warning ? `<p class="warning">${result.warning}</p>` : ''}
+                            </div>
+                        `;
+          } else {
+            // Error message
+            modalBody.innerHTML = `
+                            <div class="result-message error">
+                                <h4>Error</h4>
+                                <p>${result.message}</p>
+                            </div>
+                        `;
+          }
+
+          // Update footer buttons
+          modalFooter.innerHTML = '';
+          const closeBtn = document.createElement('button');
+          closeBtn.className = 'close-btn';
+          closeBtn.textContent = 'Close';
+          modalFooter.appendChild(closeBtn);
+
+          closeBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+              modalOverlay.remove();
+
+              // Refresh the game card to show updated DXVK status
+              if (result.success) {
+                // Force a reload of the games tab to refresh the DXVK status
+                initInstalledGamesTab();
+              }
+            }, 300);
+          });
+        } catch (error) {
+          console.error('Error applying DXVK:', error);
+          modalBody.innerHTML = `
+                        <div class="result-message error">
+                            <h4>Error</h4>
+                            <p>An error occurred while applying DXVK: ${error.message}</p>
+                        </div>
+                    `;
+
+          // Update footer buttons
+          modalFooter.innerHTML = '';
+          const closeBtn = document.createElement('button');
+          closeBtn.className = 'close-btn';
+          closeBtn.textContent = 'Close';
+          modalFooter.appendChild(closeBtn);
+
+          closeBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => modalOverlay.remove(), 300);
+          });
+        }
+      });
+    }
 
     // Combine all modal elements
     modalContent.appendChild(modalHeader);
@@ -596,124 +796,26 @@ async function showDxvkSelectionModal(gameId, gameName, metadata) {
       }, 300);
     });
 
-    // Cancel button
-    cancelBtn.addEventListener('click', () => {
-      modalOverlay.classList.remove('active');
-      setTimeout(() => {
-        modalOverlay.remove();
-      }, 300);
-    });
+    // Navigate to DXVK tab button (only present when no versions installed)
+    const goToDxvkTabBtn = modalBody.querySelector('.go-to-dxvk-tab');
+    if (goToDxvkTabBtn) {
+      goToDxvkTabBtn.addEventListener('click', () => {
+        // Close the modal
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+          modalOverlay.remove();
+        }, 300);
 
-    // Version selection
-    const versionItems = modalBody.querySelectorAll('.version-item');
-    let selectedVersion = null;
-    let selectedType = null;
-
-    versionItems.forEach(item => {
-      item.addEventListener('click', () => {
-        // Remove selected class from all items
-        versionItems.forEach(i => i.classList.remove('selected'));
-
-        // Add selected class to clicked item
-        item.classList.add('selected');
-
-        // Update selected version and type
-        selectedVersion = item.getAttribute('data-version');
-        selectedType = item.getAttribute('data-type');
-
-        // Enable apply button
-        applyBtn.classList.remove('disabled');
-        applyBtn.disabled = false;
-      });
-    });
-
-    // Apply button
-    applyBtn.addEventListener('click', async () => {
-      if (!selectedVersion || !selectedType) {
-        return;
-      }
-
-      // Disable the apply button and show loading state
-      applyBtn.disabled = true;
-      applyBtn.textContent = 'Applying...';
-      applyBtn.classList.add('loading');
-
-      try {
-        // Apply DXVK to the game
-        const result = await window.electronAPI.applyDxvkToGame(
-          gameId,
-          selectedType,
-          selectedVersion
-        );
-
-        // Update modal to show result
-        modalBody.innerHTML = '';
-
-        if (result.success) {
-          // Success message
-          modalBody.innerHTML = `
-                        <div class="result-message success">
-                            <h4>Success!</h4>
-                            <p>${result.message}</p>
-                            ${result.warning ? `<p class="warning">${result.warning}</p>` : ''}
-                        </div>
-                    `;
-        } else {
-          // Error message
-          modalBody.innerHTML = `
-                        <div class="result-message error">
-                            <h4>Error</h4>
-                            <p>${result.message}</p>
-                        </div>
-                    `;
+        // Activate the DXVK versions tab
+        const dxvkTab = document.querySelector('.tab-button[data-tab="dxvk-versions"]');
+        if (dxvkTab) {
+          dxvkTab.click();
         }
-
-        // Update footer buttons
-        modalFooter.innerHTML = '';
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'close-btn';
-        closeBtn.textContent = 'Close';
-        modalFooter.appendChild(closeBtn);
-
-        closeBtn.addEventListener('click', () => {
-          modalOverlay.classList.remove('active');
-          setTimeout(() => {
-            modalOverlay.remove();
-
-            // Refresh the game card to show updated DXVK status
-            if (result.success) {
-              // Force a reload of the games tab to refresh the DXVK status
-              initInstalledGamesTab();
-            }
-          }, 300);
-        });
-      } catch (error) {
-        console.error('Error applying DXVK:', error);
-        modalBody.innerHTML = `
-                    <div class="result-message error">
-                        <h4>Error</h4>
-                        <p>An error occurred while applying DXVK: ${error.message}</p>
-                    </div>
-                `;
-
-        // Update footer buttons
-        modalFooter.innerHTML = '';
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'close-btn';
-        closeBtn.textContent = 'Close';
-        modalFooter.appendChild(closeBtn);
-
-        closeBtn.addEventListener('click', () => {
-          modalOverlay.classList.remove('active');
-          setTimeout(() => {
-            modalOverlay.remove();
-          }, 300);
-        });
-      }
-    });
+      });
+    }
   } catch (error) {
     console.error('Error showing DXVK selection modal:', error);
-    alert(`Error showing DXVK selection: ${error.message}`);
+    alert(`Error: ${error.message}`);
   }
 }
 

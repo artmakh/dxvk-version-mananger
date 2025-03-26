@@ -6,7 +6,7 @@
 
 A Windows utility to manage versions of DXVK in installed games.
 
-![](.github/screen.gif)
+[![Watch the video](.github/demo-preview.png)](https://github.com/artmakh/dxvk-version-mananger/blob/main/.github/demo.mp4)
 
 ## Features
 
