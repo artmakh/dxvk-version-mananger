@@ -105,9 +105,7 @@ async function fetchGplasyncReleases() {
         const versionMatch = item.name.match(/dxvk-gplasync-v?([0-9.]+(?:-[0-9]+)?)\.tar\.gz/);
 
         // Clean the version string to use as a safe directory name
-        const version = versionMatch
-          ? `v${versionMatch[1]}`
-          : item.name.replace(/\.tar\.gz$/, '');
+        const version = versionMatch ? `v${versionMatch[1]}` : item.name.replace(/\.tar\.gz$/, '');
 
         // Get just the filename without path separators
         const fileName = item.name;
