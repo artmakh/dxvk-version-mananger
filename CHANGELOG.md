@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/artmakh/dxvk-version-mananger/compare/v2.0.0...v2.0.1) (2026-06-28)
+
+
+### Bug Fixes
+
+* Detect latest DXVK-gplasync releases from paginated GitLab API ([#18](https://github.com/artmakh/dxvk-version-mananger/issues/18)) ([73057ba](https://github.com/artmakh/dxvk-version-mananger/commit/73057ba9d6e37327a8ff464392524d723d7d5173))
+
 ## [2.0.0](https://github.com/artmakh/dxvk-version-mananger/compare/v1.2.0...v2.0.0) (2025-03-26)
 
 
