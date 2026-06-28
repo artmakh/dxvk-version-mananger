@@ -1,6 +1,6 @@
 {
   "name": "dxvk-version-mananger",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Windows utility to manage versions of DXVK in installed games",
   "main": "src/main/index.js",
   "scripts": {
