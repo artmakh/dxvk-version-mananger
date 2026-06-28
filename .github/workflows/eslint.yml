@@ -24,8 +24,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint for a nested project with changed files and .eslintignore
-        uses: tj-actions/eslint-changed-files@0cfcd35949a961d13e964a7c2a4971c0e89b68fc # v25.3.1
-        with:
-          config_path: ".eslintrc.json"
-          extra_args: "--ext .js"
+      - name: Run ESLint
+        run: npm run lint
